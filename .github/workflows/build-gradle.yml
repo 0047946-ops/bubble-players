@@ -1,35 +1,35 @@
-name: Build Android APK (Stable Gradle 8.4)
+name: Build Android APK
 
-on:  
-  push:  
-    branches:  
-      - main  
-      - character-sync-test
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
+    - name: 取得專案程式碼
       uses: actions/checkout@v4
 
-    - name: Set up JDK 17
+    - name: 設定 JDK 17
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Setup Gradle (Lock to 8.4)
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        gradle-version: '8.4'
+    - name: 設定 Android SDK
+      uses: android-actions/setup-android@v3
 
-    - name: Build Debug APK with Gradle 8.4
-      run: gradle assembleDebug
+    - name: 強制產生 Gradle 8.5 執行環境
+      run: gradle wrapper --gradle-version 8.5 --distribution-type bin
 
-    - name: Upload APK Artifact
+    - name: 開始編譯 APK
+      run: ./gradlew assembleDebug
+
+    - name: 上傳 APK 輸出
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug
+        name: UltraPlayer-APK
         path: app/build/outputs/apk/debug/app-debug.apk
