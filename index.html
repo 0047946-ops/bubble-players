@@ -3,71 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultra Web Video Player</title>
+    <title>Ultra YouTube Player (無廣告)</title>
     <style>
-        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
-        .top-bar { display: flex; background: #121212; padding: 10px; gap: 8px; }
-        .top-bar input { flex: 1; background: #242424; border: none; color: #fff; padding: 8px; border-radius: 4px; }
-        .top-bar button { background: #FF0000; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
-        video { width: 100%; flex: 1; background: #000; outline: none; }
-        .controls { display: flex; background: #121212; padding: 10px; justify-content: center; gap: 10px; }
-        .controls button { background: #333; color: #fff; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; }
-        .status { background: #1E1E1E; padding: 6px 10px; font-size: 12px; color: #00FF00; }
+        body { 
+            margin: 0; 
+            background: #000; 
+            color: #fff; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+        }
+        .top-bar { 
+            display: flex; 
+            background: #121212; 
+            padding: 10px; 
+            gap: 8px; 
+            align-items: center;
+        }
+        .top-bar input { 
+            flex: 1; 
+            background: #242424; 
+            border: 1px solid #333; 
+            color: #fff; 
+            padding: 10px; 
+            border-radius: 6px; 
+            font-size: 14px;
+        }
+        .top-bar button { 
+            background: #FF0000; 
+            color: #fff; 
+            border: none; 
+            padding: 10px 16px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold;
+        }
+        .top-bar button.home-btn {
+            background: #333;
+        }
+        /* 直接載入無廣告 YouTube 前端，一打開就是 YouTube */
+        iframe { 
+            width: 100%; 
+            flex: 1; 
+            border: none; 
+            background: #000; 
+        }
+        .status { 
+            background: #1E1E1E; 
+            padding: 6px 12px; 
+            font-size: 12px; 
+            color: #00FF00; 
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <button onclick="loadDefault()">首頁</button>
-        <input type="text" id="urlInput" placeholder="輸入 MP4 / HLS 串流網址">
-        <button onclick="playCustomUrl()">播放</button>
+        <button class="home-btn" onclick="loadYouTubeHome()">YouTube 首頁</button>
+        <input type="text" id="ytUrlInput" placeholder="貼上 YouTube 影片網址或直接在下方點擊瀏覽">
+        <button onclick="playYouTubeUrl()">播放</button>
     </div>
 
-    <video id="videoPlayer" controls autoplay playsinline></video>
+    <!-- 透過開源無廣告 YouTube 代理視窗，一打開就直接連到 YouTube 且完美阻擋廣告 -->
+    <iframe id="ytFrame" src="https://piped.video" allowfullscreen></iframe>
 
-    <div class="controls">
-        <button onclick="skip(-10)">-10s</button>
-        <button onclick="changeSpeed()">倍速</button>
-        <button onclick="skip(10)">+10s</button>
+    <div class="status">
+        <span id="statusText">狀態：已直接連線至無廣告 YouTube 核心</span>
+        <span>Ultra Web Player</span>
     </div>
-
-    <div class="status" id="statusText">狀態：無廣告高效能核心運作中</div>
 
     <script>
-        const video = document.getElementById('videoPlayer');
+        const ytFrame = document.getElementById('ytFrame');
         const statusText = document.getElementById('statusText');
-        let speeds = [1.0, 1.25, 1.5, 2.0];
-        let speedIdx = 0;
 
-        function loadDefault() {
-            statusText.innerText = "狀態：已載入展示串流";
-            video.src = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
-            video.play();
+        function loadYouTubeHome() {
+            ytFrame.src = "https://piped.video";
+            statusText.innerText = "狀態：已切換至 YouTube 無廣告首頁";
         }
 
-        function playCustomUrl() {
-            const url = document.getElementById('urlInput').value.trim();
-            if(url) {
-                video.src = url;
-                video.play();
-                statusText.innerText = "狀態：播放自訂網址";
+        function playYouTubeUrl() {
+            const rawUrl = document.getElementById('ytUrlInput').value.trim();
+            if (!rawUrl) return;
+
+            // 自動解析 YouTube 影片 ID 轉入無廣告播放器
+            let videoId = "";
+            if (rawUrl.includes("youtu.be/")) {
+                videoId = rawUrl.split("youtu.be/")[1]?.split("?")[0];
+            } else if (rawUrl.includes("watch?v=")) {
+                videoId = rawUrl.split("watch?v=")[1]?.split("&")[0];
+            }
+
+            if (videoId) {
+                ytFrame.src = `https://piped.video/embed/${videoId}?autoplay=1`;
+                statusText.innerText = "狀態：正在以無廣告模式播放指定影片";
+            } else {
+                alert("請輸入有效的 YouTube 影片網址");
             }
         }
-
-        function skip(seconds) {
-            video.currentTime += seconds;
-        }
-
-        function changeSpeed() {
-            speedIdx = (speedIdx + 1) % speeds.length;
-            video.playbackRate = speeds[speedIdx];
-            statusText.innerText = "狀態：目前倍速 " + speeds[speedIdx] + "x";
-        }
-
-        video.addEventListener('waiting', () => { statusText.innerText = "狀態：智慧緩衝中..."; });
-        video.addEventListener('playing', () => { statusText.innerText = "狀態：播放流暢"; });
-
-        loadDefault();
     </script>
 </body>
 </html>
