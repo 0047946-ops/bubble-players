@@ -27,8 +27,10 @@ jobs:
       with:
         gradle-version: '8.5'
 
-    - name: 自動產生編譯執行器
+    - name: 自動寫入 AndroidX 設定與建立執行器
       run: |
+        echo "android.useAndroidX=true" >> gradle.properties
+        echo "android.enableJetifier=true" >> gradle.properties
         gradle wrapper --gradle-version 8.5
         chmod +x gradlew
 
