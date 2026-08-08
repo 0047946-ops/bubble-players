@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SmoothPlayer</string>
+    <string name="youtube_entry">YouTube</string>
+    <string name="play">播放</string>
+    <string name="pause">暫停</string>
+    <string name="forward_10">+10 秒</string>
+    <string name="rewind_10">-10 秒</string>
+    <string name="quality">畫質</string>
+    <string name="speed">倍速</string>
+    <string name="fullscreen">全螢幕</string>
+    <string name="lock_controls">鎖定觸控</string>
+    <string name="network_disconnected">網路已斷線，保留播放狀態中…</string>
+    <string name="network_restored">網路已恢復，正在恢復播放…</string>
+    <string name="buffering">緩衝中</string>
+    <string name="error_retry">播放錯誤，正在嘗試恢復 (%1$d/4)</string>
+    <string name="enter_url">輸入影片網址 (MP4 / HLS / DASH)</string>
+    <string name="play_url">播放網址</string>
+    <string name="open_youtube">開啟 YouTube</string>
+</resources>
