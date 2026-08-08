@@ -19,8 +19,13 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: 設定 Gradle
+    - name: 設定 Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: 設定相容的 Gradle 版本 (固定為 8.5)
       uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: '8.5'
 
     - name: 開始編譯 APK
       run: gradle assembleDebug
