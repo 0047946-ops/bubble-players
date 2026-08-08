@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0D47A1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>SmoothPlayer</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+</head>
+<body>
+  <div id="homeScreen" class="screen">
+    <div class="home-container">
+      <h1 class="app-title">SmoothPlayer</h1>
+      <p class="subtitle">無廣告 · 智慧緩衝 · 網路韌性</p>
+
+      <button id="btnYouTube" class="btn btn-primary btn-lg">
+        開啟 YouTube
+      </button>
+
+      <div class="url-box">
+        <input id="urlInput" type="url" placeholder="輸入影片網址 (MP4 / HLS / m3u8)" autocomplete="off" />
+        <button id="btnPlayUrl" class="btn btn-secondary">播放</button>
+      </div>
+
+      <div id="networkStatus" class="network-status">網路狀態偵測中…</div>
+
+      <div class="tips">
+        <p>支援格式：MP4、HLS (m3u8)</p>
+        <p>斷線後會保留播放位置，恢復後自動繼續</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="playerScreen" class="screen hidden">
+    <div class="player-wrapper">
+      <video id="video" playsinline webkit-playsinline></video>
+
+      <div id="buffering" class="buffering hidden">
+        <div class="spinner"></div>
+      </div>
+
+      <div id="controls" class="controls">
+        <div class="controls-top">
+          <span id="netSpeed" class="net-speed"></span>
+          <button id="btnQuality" class="ctrl-btn">畫質</button>
+          <button id="btnSpeed" class="ctrl-btn">1.0x</button>
+          <button id="btnLock" class="ctrl-btn">鎖定</button>
+        </div>
+
+        <div class="controls-center">
+          <button id="btnRewind" class="ctrl-btn-round" title="-10秒">⏪</button>
+          <button id="btnPlayPause" class="ctrl-btn-round play-pause" title="播放/暫停">▶</button>
+          <button id="btnForward" class="ctrl-btn-round" title="+10秒">⏩</button>
+        </div>
+
+        <div class="controls-bottom">
+          <span id="currentTime">00:00</span>
+          <input id="seekBar" type="range" min="0" max="1000" value="0" step="1" />
+          <span id="duration">00:00</span>
+          <button id="btnFullscreen" class="ctrl-btn">⛶</button>
+        </div>
+
+        <div id="statusMsg" class="status-msg hidden"></div>
+      </div>
+    </div>
+
+    <button id="btnBack" class="btn-back">← 返回</button>
+  </div>
+
+  <script src="player.js"></script>
+</body>
+</html>
