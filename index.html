@@ -1,66 +1,48 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f0f0f" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>SmoothPlayer</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d10">
+  <title>StreamForge Player</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- 一打開就是 YouTube 模式 -->
-  <div id="youtubeMode" class="screen">
-    <div class="yt-header">
-      <div class="yt-logo">SmoothPlayer</div>
-      <input id="ytSearch" type="search" placeholder="搜尋或貼上 YouTube 網址..." />
-    </div>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">▶</span><span><b>STREAMFORGE</b><small>MOBILE SIGNAL ROOM</small></span></div>
+      <a class="youtube-link" href="https://m.youtube.com/" target="_blank" rel="noopener">YouTube 官方入口 ↗</a>
+    </header>
 
-    <div id="ytPlayerWrap">
-      <iframe id="ytFrame" 
-        src="https://www.youtube-nocookie.com/embed/jfKfPfyJRdk?autoplay=0&rel=0&modestbranding=1&playsinline=1"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen
-        referrerpolicy="strict-origin-when-cross-origin">
-</iframe>
-    </div>
-
-    <div class="yt-bottom-bar">
-      <button id="btnSwitchPlayer" class="yt-btn">切換自己的播放器（MP4/HLS）</button>
-    </div>
-  </div>
-
-  <!-- 自己的原生播放器模式（給 MP4 / HLS 用） -->
-  <div id="nativeMode" class="screen hidden">
-    <div class="player-wrapper">
-      <video id="video" playsinline webkit-playsinline></video>
-      <div id="buffering" class="buffering hidden"><div class="spinner"></div></div>
-
-      <div id="controls" class="controls">
-        <div class="controls-top">
-          <span id="netSpeed" class="net-speed"></span>
-          <button id="btnQuality" class="ctrl-btn">畫質</button>
-          <button id="btnSpeed" class="ctrl-btn">1.0x</button>
-          <button id="btnLock" class="ctrl-btn">鎖定</button>
-        </div>
-        <div class="controls-center">
-          <button id="btnRewind" class="ctrl-btn-round">⏪</button>
-          <button id="btnPlayPause" class="ctrl-btn-round play-pause">▶</button>
-          <button id="btnForward" class="ctrl-btn-round">⏩</button>
-        </div>
-        <div class="controls-bottom">
-          <span id="currentTime">00:00</span>
-          <input id="seekBar" type="range" min="0" max="1000" value="0" />
-          <span id="duration">00:00</span>
-          <button id="btnFullscreen" class="ctrl-btn">⛶</button>
-        </div>
-        <div id="statusMsg" class="status-msg hidden"></div>
+    <section class="player-section">
+      <div id="playerSurface" class="player-surface" aria-label="影片播放區域">
+        <video id="video" playsinline preload="metadata"></video>
+        <div id="gestureHint" class="gesture-hint" aria-live="polite"></div>
+        <div class="gesture-guide"><span>雙擊左側 −10</span><span>左右滑動調整</span><span>雙擊右側 +10</span></div>
       </div>
-    </div>
-    <button id="btnBackToYt" class="btn-back">← 返回 YouTube</button>
-  </div>
+      <div class="controls">
+        <div class="progress-row"><div id="bufferBar" class="buffer-bar"></div><input id="progress" type="range" min="0" max="0" value="0" step="0.1" aria-label="播放進度"></div>
+        <div class="control-row">
+          <button id="back10" class="round">↶<small>10</small></button>
+          <button id="play" class="play" aria-label="播放或暫停">▶</button>
+          <button id="forward10" class="round">↷<small>10</small></button>
+          <span id="time" class="time">00:00 / 00:00</span>
+          <span class="grow"></span>
+          <select id="speed" aria-label="播放速度"><option>0.5</option><option>0.75</option><option selected>1</option><option>1.25</option><option>1.5</option><option>2</option></select>
+          <button id="fullscreen" class="icon-button" aria-label="全螢幕">⛶</button>
+        </div>
+      </div>
+    </section>
 
+    <aside class="dashboard">
+      <section class="panel status-panel"><div class="panel-title">播放工作台 <span id="online">● ONLINE</span></div><strong id="status">Source ready · 等待媒體來源</strong><div class="meta"><span id="quality">自動畫質</span><span id="buffer">0.0s buffer</span></div></section>
+      <section class="panel network-panel"><div class="panel-title">網路訊號 <span>⌁</span></div><div id="signalBars" class="signal-bars"><i></i><i></i><i></i><i></i><i></i></div><div class="network-readout"><strong id="speedReadout">估算中</strong><small id="networkType">偵測連線</small></div></section>
+      <section class="panel source-panel"><div class="panel-title">媒體來源 <small id="mode">NATIVE</small></div><label>STREAM URL<input id="source" value="https://storage.googleapis.com/coverr-main/mp4/Mt_Baker.mp4" placeholder="貼上 MP4、HLS 或 DASH 網址"></label><button id="load" class="load-button">載入來源 <span>↗</span></button><p>支援 MP4、HLS、DASH；來源需允許 CORS。只播放你有權使用的內容。</p></section>
+    </aside>
+    <footer>不插入自有廣告 <span>播放狀態自動保存</span></footer>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.17/dist/hls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dashjs@5.2.0/dist/modern/umd/dash.all.min.js"></script>
   <script src="player.js"></script>
 </body>
 </html>
