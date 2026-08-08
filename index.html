@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultra Web Video Player</title>
+    <style>
+        body { margin: 0; background: #000; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
+        .top-bar { display: flex; background: #121212; padding: 10px; gap: 8px; }
+        .top-bar input { flex: 1; background: #242424; border: none; color: #fff; padding: 8px; border-radius: 4px; }
+        .top-bar button { background: #FF0000; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+        video { width: 100%; flex: 1; background: #000; outline: none; }
+        .controls { display: flex; background: #121212; padding: 10px; justify-content: center; gap: 10px; }
+        .controls button { background: #333; color: #fff; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; }
+        .status { background: #1E1E1E; padding: 6px 10px; font-size: 12px; color: #00FF00; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <button onclick="loadDefault()">首頁</button>
+        <input type="text" id="urlInput" placeholder="輸入 MP4 / HLS 串流網址">
+        <button onclick="playCustomUrl()">播放</button>
+    </div>
+
+    <video id="videoPlayer" controls autoplay playsinline></video>
+
+    <div class="controls">
+        <button onclick="skip(-10)">-10s</button>
+        <button onclick="changeSpeed()">倍速</button>
+        <button onclick="skip(10)">+10s</button>
+    </div>
+
+    <div class="status" id="statusText">狀態：無廣告高效能核心運作中</div>
+
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const statusText = document.getElementById('statusText');
+        let speeds = [1.0, 1.25, 1.5, 2.0];
+        let speedIdx = 0;
+
+        function loadDefault() {
+            statusText.innerText = "狀態：已載入展示串流";
+            video.src = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+            video.play();
+        }
+
+        function playCustomUrl() {
+            const url = document.getElementById('urlInput').value.trim();
+            if(url) {
+                video.src = url;
+                video.play();
+                statusText.innerText = "狀態：播放自訂網址";
+            }
+        }
+
+        function skip(seconds) {
+            video.currentTime += seconds;
+        }
+
+        function changeSpeed() {
+            speedIdx = (speedIdx + 1) % speeds.length;
+            video.playbackRate = speeds[speedIdx];
+            statusText.innerText = "狀態：目前倍速 " + speeds[speedIdx] + "x";
+        }
+
+        video.addEventListener('waiting', () => { statusText.innerText = "狀態：智慧緩衝中..."; });
+        video.addEventListener('playing', () => { statusText.innerText = "狀態：播放流暢"; });
+
+        loadDefault();
+    </script>
+</body>
+</html>
