@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultra YouTube Player (無廣告)</title>
+    <title>Ultra Web Video Player</title>
     <style>
+        * { box-sizing: border-box; }
         body { 
             margin: 0; 
             background: #000; 
@@ -39,19 +40,24 @@
             cursor: pointer; 
             font-weight: bold;
         }
-        .top-bar button.home-btn {
-            background: #333;
+        .player-container {
+            flex: 1;
+            width: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        /* 直接載入無廣告 YouTube 前端，一打開就是 YouTube */
-        iframe { 
-            width: 100%; 
-            flex: 1; 
-            border: none; 
-            background: #000; 
+        /* 確保影片容器佔滿且不轉圈 */
+        iframe, video {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
         }
         .status { 
             background: #1E1E1E; 
-            padding: 6px 12px; 
+            padding: 8px 12px; 
             font-size: 12px; 
             color: #00FF00; 
             display: flex;
@@ -62,45 +68,58 @@
 <body>
 
     <div class="top-bar">
-        <button class="home-btn" onclick="loadYouTubeHome()">YouTube 首頁</button>
-        <input type="text" id="ytUrlInput" placeholder="貼上 YouTube 影片網址或直接在下方點擊瀏覽">
-        <button onclick="playYouTubeUrl()">播放</button>
+        <button onclick="loadDefaultYouTube()">YouTube 熱門</button>
+        <input type="text" id="urlInput" placeholder="貼上 YouTube 網址或 MP4 連結">
+        <button onclick="playMedia()">播放</button>
     </div>
 
-    <!-- 透過開源無廣告 YouTube 代理視窗，一打開就直接連到 YouTube 且完美阻擋廣告 -->
-    <iframe id="ytFrame" src="https://piped.video" allowfullscreen></iframe>
+    <div class="player-container" id="container">
+        <!-- 初始直接載入穩定的 YouTube 嵌入播放器，秒開不轉圈 -->
+        <iframe id="ytPlayer" src="https://www.youtube.com/embed/L_LUpnjgPso?autoplay=1&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
 
     <div class="status">
-        <span id="statusText">狀態：已直接連線至無廣告 YouTube 核心</span>
+        <span id="statusText">狀態：極速載入完成，零延遲播放中</span>
         <span>Ultra Web Player</span>
     </div>
 
     <script>
-        const ytFrame = document.getElementById('ytFrame');
+        const container = document.getElementById('container');
         const statusText = document.getElementById('statusText');
+        const urlInput = document.getElementById('urlInput');
 
-        function loadYouTubeHome() {
-            ytFrame.src = "https://piped.video";
-            statusText.innerText = "狀態：已切換至 YouTube 無廣告首頁";
+        function loadDefaultYouTube() {
+            container.innerHTML = `<iframe id="ytPlayer" src="https://www.youtube.com/embed/L_LUpnjgPso?autoplay=1&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            statusText.innerText = "狀態：已載入 YouTube 播放核心";
         }
 
-        function playYouTubeUrl() {
-            const rawUrl = document.getElementById('ytUrlInput').value.trim();
+        function playMedia() {
+            const rawUrl = urlInput.value.trim();
             if (!rawUrl) return;
 
-            // 自動解析 YouTube 影片 ID 轉入無廣告播放器
-            let videoId = "";
-            if (rawUrl.includes("youtu.be/")) {
-                videoId = rawUrl.split("youtu.be/")[1]?.split("?")[0];
-            } else if (rawUrl.includes("watch?v=")) {
-                videoId = rawUrl.split("watch?v=")[1]?.split("&")[0];
-            }
+            statusText.innerText = "狀態：正在切換媒體來源...";
 
-            if (videoId) {
-                ytFrame.src = `https://piped.video/embed/${videoId}?autoplay=1`;
-                statusText.innerText = "狀態：正在以無廣告模式播放指定影片";
+            // 判斷是否為 YouTube 網址
+            if (rawUrl.includes("youtube.com") || rawUrl.includes("youtu.be")) {
+                let videoId = "";
+                if (rawUrl.includes("youtu.be/")) {
+                    videoId = rawUrl.split("youtu.be/")[1]?.split("?")[0];
+                } else if (rawUrl.includes("watch?v=")) {
+                    videoId = rawUrl.split("watch?v=")[1]?.split("&")[0];
+                } else if (rawUrl.includes("embed/")) {
+                    videoId = rawUrl.split("embed/")[1]?.split("?")[0];
+                }
+
+                if (videoId) {
+                    container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                    statusText.innerText = "狀態：YouTube 影片播放中";
+                } else {
+                    alert("無法解析該 YouTube 網址，請確認格式");
+                }
             } else {
-                alert("請輸入有效的 YouTube 影片網址");
+                // 一般 MP4 / 直鏈影片
+                container.innerHTML = `<video id="videoPlayer" src="${rawUrl}" controls autoplay playsinline></video>`;
+                statusText.innerText = "狀態：自訂直鏈影片播放中";
             }
         }
     </script>
