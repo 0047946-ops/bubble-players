@@ -2,7 +2,7 @@ name: Build SmoothPlayer APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, bubble-playerss ]
   workflow_dispatch:
 
 jobs:
